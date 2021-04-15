@@ -1,0 +1,245 @@
+﻿@model List<MDBFullPageImage.Models.vw_poblacion>
+
+@{
+    ViewBag.Title = "Visor";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+<h2>Visor</h2>
+
+<div id="map" style="margin-bottom: 2em;"></div>
+@using (Html.BeginForm("Visor", "Home", FormMethod.Get))
+{
+<table id="poblacion" class="bordered listdir datatables super-responsive">
+    <thead>
+        <tr>
+            <th>
+                <strong>Nombre Municipio</strong>
+            </th>
+
+            <th>
+                <strong>Censo poblacional 2015</strong>
+            </th>
+
+            <th>
+                <strong>Sexo</strong>
+            </th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.nombremunicipio)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.poblacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.sexo)
+            </td>
+            
+        </tr>
+        }
+    </tbody>
+
+</table>
+
+    <input type="hidden" id="coordinates" name="coordinates" />
+    <input type="hidden" id="type" name="type" />
+    <div>
+        <button type="submit" class="btn btn-primary" style="margin: auto;display: block;">Buscar</button>
+    </div>
+}
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+<script>
+    var map = L.map('map').setView([12.136005232925378, -86.297607421875], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    //DEFINICIÓN DE WORKSPACE
+    var url = 'http://localhost:8080/geoserver/ows?';
+
+    //DEFINICIÓN DE CAPAS BASES
+    var terreno_osm = L.tileLayer.provider('Stamen.TerrainBackground', { maxZoom: 14 });
+    var osm_completo = L.tileLayer.provider('OpenStreetMap.Mapnik', { maxZoom: 14 });
+    var satelite_esri = L.tileLayer.provider('Esri.WorldImagery', { maxZoom: 14 });
+
+    //función para mostrar icono en cada capa
+    function iconByName(name) {
+        return '<i class="icon ' + name + '"></i>';
+    }
+
+    var limites = L.tileLayer.betterWms(url, { layers: 'metadato:municipiosmapa', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+
+    //Lista colapsable de capas bases
+    var baseLayers =
+        [
+            {
+                group: "Capas bases",
+                collapsed: true,
+                layers:
+                    [
+                        {
+                            name: "Completo (OSM)",
+                            //icon: iconByName('icon-world'),
+                            layer: osm_completo
+                        },
+                        {
+                            name: "Sat&eacute;lite (ESRI)",
+                            //icon: iconByName('icon-mundo'),
+                            layer: satelite_esri
+                        },
+                        {
+                            name: "Terreno (OSM)",
+                            //icon: iconByName('icon-mundo'),
+                            layer: terreno_osm
+                        },
+
+                        {
+                            name: "Limites de Nicaragua",
+                            layer: limites
+                        }
+                    ]
+            }
+        ];
+
+    var hombres = L.tileLayer.betterWms(url, { layers: 'metadato:vw_poblacionhombre', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+    var mujeres = L.tileLayer.betterWms(url, { layers: 'metadato:vw_poblacionmujer', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+    var coropletahombre = L.tileLayer.betterWms(url, { layers: 'metadato:Coropletahombre', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+    var coropletamujer = L.tileLayer.betterWms(url, { layers: 'metadato:Coropletamujer', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+    var maxhombre = L.tileLayer.betterWms(url, { layers: 'metadato:maximapoblacionhombre', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+    var maxamujer = L.tileLayer.betterWms(url, { layers: 'metadato:maximapoblacionmujer', transparent: true, visible: true, format: 'image/png', maxZoom: 14 });
+
+    var overLayers = [
+        {
+            group: "Capas",
+            icon: iconByName('icon-capas'),
+            collapsed: true,
+            layers:
+                [
+                    {
+                        name: "Censo hombre",
+                        icon: iconByName('icon-cesta'),
+                        layer: hombres
+                    },
+                    {
+                       name: "Censo mujer",
+                       icon: iconByName('icon-cesta'),
+                       layer: mujeres
+                    },
+                    {
+                        name: "Coropleta hombre",
+                        icon: iconByName('icon-cesta'),
+                        layer: coropletahombre
+                    },
+                    {
+                        name: "Coropleta mujer",
+                        icon: iconByName('icon-cesta'),
+                        layer: coropletamujer
+                    },
+                    ,
+                    {
+                        name: "Maxima poblacion mujer",
+                        icon: iconByName('icon-cesta'),
+                        layer: maxamujer
+                    },
+                    {
+                        name: "Coropleta poblacion hombre",
+                        icon: iconByName('icon-cesta'),
+                        layer: maxhombre
+                    }
+                ]
+        },
+    ];
+
+    map.addLayer(osm_completo);
+
+    var panelLayers = new L.Control.PanelLayers(baseLayers, overLayers,
+        {
+            collapsibleGroups: true,
+            collapsed: true
+        });
+
+    map.addControl(panelLayers);
+
+    // Initialise the FeatureGroup to store editable layers
+    var editableLayers = new L.FeatureGroup();
+    map.addLayer(editableLayers);
+
+    var drawPluginOptions = {
+        position: 'topleft',
+        draw: {
+            rectangle: {
+                allowIntersection: false, // Restricts shapes to simple polygons
+                drawError: {
+                    color: '#e1e100', // Color the shape will turn when intersects
+                    message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+                },
+                shapeOptions: {
+                    color: '#97009c'
+                }
+            },
+            polygon: {
+                allowIntersection: false, // Restricts shapes to simple polygons
+                drawError: {
+                    color: '#e1e100', // Color the shape will turn when intersects
+                    message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+                },
+                shapeOptions: {
+                    color: '#97009c'
+                }
+            },
+            // disable toolbar item by setting it to false
+            polyline: false,
+            circle: false, // Turns off this drawing tool
+            marker: true,
+            circlemarker: false
+        },
+        edit: {
+            featureGroup: editableLayers, //REQUIRED!!
+            remove: true
+        }
+
+    };
+
+    // Initialise the draw control and pass it the FeatureGroup of editable layers
+    var drawControl = new L.Control.Draw(drawPluginOptions);
+    map.addControl(drawControl);
+
+    map.on(L.Draw.Event.CREATED, function (e) {
+        var type = e.layerType,
+            layer = e.layer;
+
+        if (type === 'polygon') {
+            $("#coordinates").val(layer.getLatLngs());
+            $("#type").val(type);
+        }
+        if (type === 'rectangle') {
+            $("#coordinates").val(layer.getLatLngs());
+            $("#type").val(type);
+        }
+        if (type === 'marker') {
+            $("#coordinates").val(layer.getLatLng());
+            $("#type").val(type);
+            console.log(layer.getLatLng());
+        }
+
+        editableLayers.addLayer(layer);
+    });
+
+    $(document).ready(function () {
+        $('#poblacion').DataTable();
+    });
+
+</script>
+

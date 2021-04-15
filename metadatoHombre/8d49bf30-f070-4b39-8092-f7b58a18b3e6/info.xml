@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info version="1.1">
+  <general>
+    <createDate>2020-12-11T21:07:56</createDate>
+    <changeDate>2020-12-11T21:34:56</changeDate>
+    <schema>iso19115-3.2018</schema>
+    <isTemplate>n</isTemplate>
+    <localId>163</localId>
+    <format>full</format>
+    <rating>0</rating>
+    <popularity>3</popularity>
+    <uuid>8d49bf30-f070-4b39-8092-f7b58a18b3e6</uuid>
+    <siteId>cced7390-86e3-4fc1-bbc4-75fb3e8891f3</siteId>
+    <siteName>My GeoNetwork catalogue</siteName>
+  </general>
+  <categories />
+  <privileges>
+    <group name="sample" groupOwner="true">
+      <operation name="view" />
+      <operation name="notify" />
+    </group>
+  </privileges>
+  <public>
+    <file name="vw_poblacionhombre.shp" changeDate="2020-12-11T21:29:07" />
+  </public>
+  <private />
+</info>
+

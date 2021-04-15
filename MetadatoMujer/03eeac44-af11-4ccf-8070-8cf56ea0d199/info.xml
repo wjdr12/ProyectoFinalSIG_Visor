@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info version="1.1">
+  <general>
+    <createDate>2020-12-11T21:38:53</createDate>
+    <changeDate>2020-12-11T21:46:35</changeDate>
+    <schema>iso19115-3.2018</schema>
+    <isTemplate>n</isTemplate>
+    <localId>166</localId>
+    <format>full</format>
+    <rating>0</rating>
+    <popularity>1</popularity>
+    <uuid>03eeac44-af11-4ccf-8070-8cf56ea0d199</uuid>
+    <siteId>cced7390-86e3-4fc1-bbc4-75fb3e8891f3</siteId>
+    <siteName>My GeoNetwork catalogue</siteName>
+  </general>
+  <categories />
+  <privileges>
+    <group name="sample" groupOwner="true">
+      <operation name="view" />
+      <operation name="notify" />
+    </group>
+  </privileges>
+  <public>
+    <file name="vw_poblacionmujer.shp" changeDate="2020-12-11T21:45:04" />
+  </public>
+  <private />
+</info>
+
